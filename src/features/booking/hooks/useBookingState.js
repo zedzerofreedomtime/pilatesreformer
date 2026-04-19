@@ -1,30 +1,42 @@
 import { useState } from 'react'
 import {
   bookingModes,
-  equipmentCatalog,
   rentalPlanCatalog,
-  trainerCatalog,
   trainerServicePlans,
 } from '../../../data/siteData'
 
-function useBookingState() {
+function useBookingState({ equipmentCatalog, trainerCatalog }) {
   const [selectedModeId, setSelectedModeId] = useState('bundle')
   const [selectedEquipmentId, setSelectedEquipmentId] = useState('reformer')
   const [selectedRentalPlanId, setSelectedRentalPlanId] = useState('progress')
-  const [selectedTrainerId, setSelectedTrainerId] = useState(trainerCatalog[0].id)
+  const [selectedTrainerId, setSelectedTrainerId] = useState(
+    trainerCatalog[0]?.id ?? '',
+  )
   const [selectedTrainerServicePlanId, setSelectedTrainerServicePlanId] =
     useState('trainer-core')
+
+  const resolvedEquipmentId = equipmentCatalog.some(
+    (equipment) => equipment.id === selectedEquipmentId,
+  )
+    ? selectedEquipmentId
+    : equipmentCatalog[0]?.id ?? ''
+
+  const resolvedTrainerId = trainerCatalog.some(
+    (trainer) => trainer.id === selectedTrainerId,
+  )
+    ? selectedTrainerId
+    : trainerCatalog[0]?.id ?? ''
 
   const selectedMode =
     bookingModes.find((mode) => mode.id === selectedModeId) ?? bookingModes[0]
   const selectedEquipment =
-    equipmentCatalog.find((equipment) => equipment.id === selectedEquipmentId) ??
+    equipmentCatalog.find((equipment) => equipment.id === resolvedEquipmentId) ??
     equipmentCatalog[0]
   const selectedRentalPlan =
     rentalPlanCatalog.find((plan) => plan.id === selectedRentalPlanId) ??
     rentalPlanCatalog[0]
   const selectedTrainer =
-    trainerCatalog.find((trainer) => trainer.id === selectedTrainerId) ??
+    trainerCatalog.find((trainer) => trainer.id === resolvedTrainerId) ??
     trainerCatalog[0]
   const selectedTrainerServicePlan =
     trainerServicePlans.find((plan) => plan.id === selectedTrainerServicePlanId) ??
@@ -62,9 +74,9 @@ function useBookingState() {
 
   const resetBooking = () => {
     setSelectedModeId('bundle')
-    setSelectedEquipmentId('reformer')
+    setSelectedEquipmentId(equipmentCatalog[0]?.id ?? 'reformer')
     setSelectedRentalPlanId('progress')
-    setSelectedTrainerId(trainerCatalog[0].id)
+    setSelectedTrainerId(trainerCatalog[0]?.id ?? '')
     setSelectedTrainerServicePlanId('trainer-core')
   }
 
@@ -89,11 +101,11 @@ function useBookingState() {
   const bookingState = {
     selectedModeId,
     selectedMode,
-    selectedEquipmentId,
+    selectedEquipmentId: resolvedEquipmentId,
     selectedEquipment,
     selectedRentalPlanId,
     selectedRentalPlan,
-    selectedTrainerId,
+    selectedTrainerId: resolvedTrainerId,
     selectedTrainer,
     selectedTrainerServicePlanId,
     selectedTrainerServicePlan,

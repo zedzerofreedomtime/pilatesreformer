@@ -1,9 +1,7 @@
 import { useState } from 'react'
 import {
   bookingModes,
-  equipmentCatalog,
   rentalPlanCatalog,
-  trainerCatalog,
   trainerServicePlans,
 } from '../data/siteData'
 import TrainerDetailModal from '../features/booking/components/modal/TrainerDetailModal'
@@ -15,7 +13,13 @@ import RentalPlanSection from '../features/booking/sections/RentalPlanSection'
 import TrainerSelectionSection from '../features/booking/sections/TrainerSelectionSection'
 import TrainerServiceSection from '../features/booking/sections/TrainerServiceSection'
 
-function BookingPage({ bookingState, bookingSummary, bookingActions }) {
+function BookingPage({
+  bookingState,
+  bookingSummary,
+  bookingActions,
+  equipmentCatalog,
+  trainerCatalog,
+}) {
   const {
     selectedModeId,
     selectedMode,
