@@ -1,0 +1,11 @@
+<svg width="900" height="900" viewBox="0 0 900 900" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="900" height="900" rx="48" fill="#EEF5F3"/>
+  <circle cx="450" cy="320" r="130" fill="#E9B48D"/>
+  <path d="M310 312C314 194 390 136 474 136C560 136 616 202 610 308C570 282 530 270 464 270C406 270 364 282 310 312Z" fill="#132B28"/>
+  <rect x="230" y="482" width="440" height="248" rx="102" fill="#263A57"/>
+  <rect x="330" y="530" width="240" height="168" rx="72" fill="#DCE8F7"/>
+  <circle cx="408" cy="326" r="12" fill="#5E3E2A"/>
+  <circle cx="492" cy="326" r="12" fill="#5E3E2A"/>
+  <path d="M404 380C430 398 468 398 496 380" stroke="#8E553B" stroke-width="10" stroke-linecap="round"/>
+  <text x="70" y="110" fill="#132B28" font-size="54" font-family="Arial, sans-serif" font-weight="700">Coach Tone</text>
+</svg>

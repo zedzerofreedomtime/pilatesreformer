@@ -1,0 +1,14 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" rx="40" fill="#EEF4F4"/>
+  <rect x="286" y="126" width="42" height="494" rx="20" fill="#143C36"/>
+  <rect x="870" y="126" width="42" height="494" rx="20" fill="#143C36"/>
+  <rect x="286" y="126" width="626" height="24" rx="12" fill="#143C36"/>
+  <rect x="484" y="314" width="230" height="286" rx="26" fill="#C98C61"/>
+  <circle cx="410" cy="246" r="36" fill="#D59D73"/>
+  <circle cx="788" cy="246" r="36" fill="#D59D73"/>
+  <path d="M410 282V470" stroke="#D59D73" stroke-width="14" stroke-linecap="round"/>
+  <path d="M788 282V470" stroke="#D59D73" stroke-width="14" stroke-linecap="round"/>
+  <path d="M410 340L486 398" stroke="#D59D73" stroke-width="14" stroke-linecap="round"/>
+  <path d="M788 340L710 398" stroke="#D59D73" stroke-width="14" stroke-linecap="round"/>
+  <text x="240" y="96" fill="#143C36" font-size="58" font-family="Arial, sans-serif" font-weight="700">Functional Trainer</text>
+</svg>

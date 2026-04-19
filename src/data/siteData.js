@@ -2,6 +2,7 @@ export const equipmentCatalog = [
   {
     id: 'reformer',
     name: 'Pilates Reformer',
+    image: '/images/equipment-reformer.svg',
     badge: 'เล่นเองที่บ้านได้',
     monthlyRate: 12900,
     trainerMode: 'optional',
@@ -18,6 +19,7 @@ export const equipmentCatalog = [
   {
     id: 'tower',
     name: 'Cadillac / Tower',
+    image: '/images/equipment-tower.svg',
     badge: 'ต้องมีครูประกบ',
     monthlyRate: 18500,
     trainerMode: 'required',
@@ -34,6 +36,7 @@ export const equipmentCatalog = [
   {
     id: 'chair',
     name: 'Stability Chair',
+    image: '/images/equipment-chair.svg',
     badge: 'ต้องมีครูประกบ',
     monthlyRate: 14900,
     trainerMode: 'required',
@@ -50,6 +53,7 @@ export const equipmentCatalog = [
   {
     id: 'functional',
     name: 'Functional Trainer',
+    image: '/images/equipment-functional.svg',
     badge: 'ต้องมีครูประกบ',
     monthlyRate: 16900,
     trainerMode: 'required',
@@ -65,35 +69,364 @@ export const equipmentCatalog = [
   },
 ]
 
-export const trainerCatalog = [
-  {
+const weekDays = [
+  { id: 'sun', shortLabel: 'อา.', label: 'วันอาทิตย์' },
+  { id: 'mon', shortLabel: 'จ.', label: 'วันจันทร์' },
+  { id: 'tue', shortLabel: 'อ.', label: 'วันอังคาร' },
+  { id: 'wed', shortLabel: 'พ.', label: 'วันพุธ' },
+  { id: 'thu', shortLabel: 'พฤ.', label: 'วันพฤหัสบดี' },
+  { id: 'fri', shortLabel: 'ศ.', label: 'วันศุกร์' },
+  { id: 'sat', shortLabel: 'ส.', label: 'วันเสาร์' },
+]
+
+const hourSlots = Array.from({ length: 9 }, (_, index) => 8 + index)
+
+const formatHourLabel = (hour) => `${String(hour).padStart(2, '0')}:00`
+
+const createWeeklySchedule = (bookedSlotKeys) =>
+  weekDays.map((day) => {
+    const slots = hourSlots.map((hour) => {
+      const start = formatHourLabel(hour)
+      const end = formatHourLabel(hour + 1)
+      const key = `${day.id}-${start}`
+      const status = bookedSlotKeys.includes(key) ? 'booked' : 'available'
+
+      return {
+        key,
+        label: `${start} - ${end}`,
+        status,
+      }
+    })
+
+    const availableCount = slots.filter((slot) => slot.status === 'available').length
+    const bookedCount = slots.length - availableCount
+
+    return {
+      id: day.id,
+      label: day.label,
+      shortLabel: day.shortLabel,
+      slots,
+      availableCount,
+      bookedCount,
+    }
+  })
+
+const buildTrainer = ({
+  id,
+  name,
+  image,
+  specialty,
+  sessionRate,
+  availability,
+  summary,
+  bookedSlotKeys,
+}) => {
+  const weeklySchedule = createWeeklySchedule(bookedSlotKeys)
+  const availableSlots = weeklySchedule.reduce(
+    (total, day) => total + day.availableCount,
+    0,
+  )
+  const bookedSlots = weeklySchedule.reduce(
+    (total, day) => total + day.bookedCount,
+    0,
+  )
+
+  return {
+    id,
+    name,
+    image,
+    specialty,
+    sessionRate,
+    availability,
+    summary,
+    weeklySchedule,
+    availableSlots,
+    bookedSlots,
+    scheduleWindow: 'อาทิตย์ - เสาร์ เวลา 08:00 - 17:00',
+  }
+}
+
+const baseTrainerCatalog = [
+  buildTrainer({
     id: 'coach-pim',
     name: 'Coach Pim',
+    image: '/images/trainer-pim.svg',
     specialty: 'Reformer foundation และ posture reset',
     sessionRate: 1800,
     availability: 'Onsite กรุงเทพฯ / Online cueing',
     summary:
       'เหมาะกับคนที่อยากปูพื้นฐานให้ถูกตั้งแต่แรก แล้วค่อยไปฝึกต่อเองที่บ้านได้อย่างมั่นใจ',
-  },
-  {
+    bookedSlotKeys: [
+      'sun-09:00',
+      'sun-10:00',
+      'mon-13:00',
+      'mon-14:00',
+      'tue-08:00',
+      'wed-11:00',
+      'wed-12:00',
+      'thu-15:00',
+      'fri-09:00',
+      'fri-10:00',
+      'sat-16:00',
+    ],
+  }),
+  buildTrainer({
     id: 'coach-tone',
     name: 'Coach Tone',
+    image: '/images/trainer-tone.svg',
     specialty: 'Strength, mobility และ functional movement',
     sessionRate: 2200,
     availability: 'Onsite กรุงเทพฯ และปริมณฑล',
     summary:
       'เหมาะกับคนที่อยากได้โค้ชสาย strength และเครื่องที่ต้องคุมท่าละเอียด',
-  },
-  {
+    bookedSlotKeys: [
+      'sun-15:00',
+      'sun-16:00',
+      'mon-17:00',
+      'tue-09:00',
+      'tue-10:00',
+      'wed-14:00',
+      'thu-08:00',
+      'thu-09:00',
+      'fri-13:00',
+      'sat-10:00',
+      'sat-11:00',
+      'sat-12:00',
+    ],
+  }),
+  buildTrainer({
     id: 'coach-fon',
     name: 'Coach Fon',
+    image: '/images/trainer-fon.svg',
     specialty: 'Private rehab flow และ breath-led pilates',
     sessionRate: 2400,
     availability: 'Weekend onsite / Hybrid follow-up',
     summary:
       'เหมาะกับลูกค้าที่ต้องการ session ลึก เน้น alignment และการฟื้นฟูการเคลื่อนไหว',
-  },
+    bookedSlotKeys: [
+      'sun-13:00',
+      'mon-10:00',
+      'mon-11:00',
+      'tue-14:00',
+      'wed-15:00',
+      'wed-16:00',
+      'thu-10:00',
+      'thu-11:00',
+      'fri-08:00',
+      'sat-09:00',
+      'sat-13:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-may',
+    name: 'Coach May',
+    image: '/images/trainer-pim.svg',
+    specialty: 'Beginner pilates และ home routine planning',
+    sessionRate: 1700,
+    availability: 'Onsite กรุงเทพฯ / Video follow-up',
+    summary:
+      'เหมาะกับลูกค้าที่เพิ่งเริ่มต้นและอยากจัดตารางฝึกที่บ้านให้ต่อเนื่องแบบไม่กดดัน',
+    bookedSlotKeys: [
+      'sun-08:00',
+      'sun-09:00',
+      'mon-12:00',
+      'tue-16:00',
+      'wed-09:00',
+      'thu-13:00',
+      'thu-14:00',
+      'fri-15:00',
+      'sat-08:00',
+      'sat-09:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-beam',
+    name: 'Coach Beam',
+    image: '/images/trainer-tone.svg',
+    specialty: 'Strength base, posture และ mobility reset',
+    sessionRate: 2100,
+    availability: 'Onsite กรุงเทพฯ / ปริมณฑล',
+    summary:
+      'เหมาะกับคนที่อยากได้โค้ชที่บาลานซ์ทั้ง strength และการแก้ posture ใน session เดียว',
+    bookedSlotKeys: [
+      'sun-11:00',
+      'mon-09:00',
+      'mon-10:00',
+      'tue-13:00',
+      'wed-08:00',
+      'wed-09:00',
+      'thu-17:00',
+      'fri-12:00',
+      'fri-13:00',
+      'sat-14:00',
+      'sat-15:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-jay',
+    name: 'Coach Jay',
+    image: '/images/trainer-fon.svg',
+    specialty: 'Athletic conditioning และ functional training',
+    sessionRate: 2300,
+    availability: 'Onsite กรุงเทพฯ / Sport-specific program',
+    summary:
+      'เหมาะกับลูกค้าที่ต้องการโค้ชสายเข้ม เน้น performance และการเคลื่อนไหวแบบนักกีฬา',
+    bookedSlotKeys: [
+      'sun-10:00',
+      'sun-11:00',
+      'mon-08:00',
+      'mon-16:00',
+      'tue-17:00',
+      'wed-13:00',
+      'thu-14:00',
+      'thu-15:00',
+      'fri-16:00',
+      'sat-10:00',
+      'sat-11:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-nat',
+    name: 'Coach Nat',
+    image: '/images/trainer-pim.svg',
+    specialty: 'Breath work และ gentle reformer progression',
+    sessionRate: 1900,
+    availability: 'Hybrid / Online cueing',
+    summary:
+      'เหมาะกับคนที่อยากได้ session นุ่ม ค่อยเป็นค่อยไป และเน้นการหายใจให้สัมพันธ์กับการฝึก',
+    bookedSlotKeys: [
+      'sun-14:00',
+      'mon-11:00',
+      'tue-08:00',
+      'tue-09:00',
+      'wed-10:00',
+      'thu-08:00',
+      'fri-10:00',
+      'fri-11:00',
+      'sat-12:00',
+      'sat-13:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-cream',
+    name: 'Coach Cream',
+    image: '/images/trainer-tone.svg',
+    specialty: 'Core focus และ private studio-style sessions',
+    sessionRate: 2000,
+    availability: 'Onsite กรุงเทพฯ / คอนโด private room',
+    summary:
+      'เหมาะกับลูกค้าที่อยากได้ session โฟกัสแกนกลางลำตัวและบรรยากาศแบบ private studio',
+    bookedSlotKeys: [
+      'sun-12:00',
+      'sun-13:00',
+      'mon-14:00',
+      'tue-10:00',
+      'wed-17:00',
+      'thu-12:00',
+      'thu-13:00',
+      'fri-14:00',
+      'fri-15:00',
+      'sat-16:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-mint',
+    name: 'Coach Mint',
+    image: '/images/trainer-fon.svg',
+    specialty: 'Alignment rehab และ balance control',
+    sessionRate: 2350,
+    availability: 'Weekend onsite / Recovery specialist',
+    summary:
+      'เหมาะกับคนที่มีประวัติบาดเจ็บหรืออยากให้ครูคุมรายละเอียดการจัด alignment อย่างใกล้ชิด',
+    bookedSlotKeys: [
+      'sun-08:00',
+      'mon-15:00',
+      'mon-16:00',
+      'tue-11:00',
+      'wed-12:00',
+      'wed-13:00',
+      'thu-16:00',
+      'fri-08:00',
+      'sat-09:00',
+      'sat-10:00',
+      'sat-11:00',
+    ],
+  }),
+  buildTrainer({
+    id: 'coach-aom',
+    name: 'Coach Aom',
+    image: '/images/trainer-pim.svg',
+    specialty: 'Lifestyle coaching และ beginner strength',
+    sessionRate: 1750,
+    availability: 'Onsite กรุงเทพฯ / Morning slots',
+    summary:
+      'เหมาะกับลูกค้าที่อยากเริ่มฝึกแบบเข้าใจง่าย มีโค้ชช่วยออกแบบ routine ให้เข้ากับชีวิตประจำวัน',
+    bookedSlotKeys: [
+      'sun-17:00',
+      'mon-08:00',
+      'tue-12:00',
+      'tue-13:00',
+      'wed-14:00',
+      'thu-09:00',
+      'thu-10:00',
+      'fri-17:00',
+      'sat-08:00',
+      'sat-14:00',
+    ],
+  }),
 ]
+
+const trainerProfiles = {
+  'coach-pim': {
+    machineFocus: ['Pilates Reformer', 'Stability Chair'],
+    exerciseFocus: ['Posture reset', 'Core foundation', 'Beginner pilates'],
+  },
+  'coach-tone': {
+    machineFocus: ['Functional Trainer', 'Cadillac / Tower'],
+    exerciseFocus: ['Strength training', 'Mobility', 'Functional movement'],
+  },
+  'coach-fon': {
+    machineFocus: ['Cadillac / Tower', 'Pilates Reformer'],
+    exerciseFocus: ['Rehab flow', 'Breath-led pilates', 'Alignment work'],
+  },
+  'coach-may': {
+    machineFocus: ['Pilates Reformer'],
+    exerciseFocus: ['Beginner pilates', 'Home routine planning', 'Light mobility'],
+  },
+  'coach-beam': {
+    machineFocus: ['Functional Trainer', 'Stability Chair'],
+    exerciseFocus: ['Strength base', 'Posture correction', 'Mobility reset'],
+  },
+  'coach-jay': {
+    machineFocus: ['Functional Trainer', 'Cadillac / Tower'],
+    exerciseFocus: [
+      'Athletic conditioning',
+      'Performance training',
+      'Functional movement',
+    ],
+  },
+  'coach-nat': {
+    machineFocus: ['Pilates Reformer'],
+    exerciseFocus: ['Breath work', 'Gentle progression', 'Recovery movement'],
+  },
+  'coach-cream': {
+    machineFocus: ['Pilates Reformer', 'Cadillac / Tower'],
+    exerciseFocus: ['Core control', 'Private studio flow', 'Body awareness'],
+  },
+  'coach-mint': {
+    machineFocus: ['Cadillac / Tower', 'Stability Chair'],
+    exerciseFocus: ['Alignment rehab', 'Balance control', 'Recovery support'],
+  },
+  'coach-aom': {
+    machineFocus: ['Pilates Reformer', 'Functional Trainer'],
+    exerciseFocus: ['Lifestyle coaching', 'Beginner strength', 'Weekly routine'],
+  },
+}
+
+export const trainerCatalog = baseTrainerCatalog.map((trainer) => ({
+  ...trainer,
+  ...trainerProfiles[trainer.id],
+}))
 
 export const rentalPlanCatalog = [
   {

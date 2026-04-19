@@ -1,0 +1,12 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" rx="40" fill="#F8F0E4"/>
+  <rect x="404" y="238" width="318" height="270" rx="28" fill="#CB8E60"/>
+  <rect x="448" y="182" width="228" height="74" rx="24" fill="#173E39"/>
+  <rect x="470" y="324" width="184" height="104" rx="18" fill="#FFF8F1"/>
+  <path d="M430 520L384 650" stroke="#173E39" stroke-width="22" stroke-linecap="round"/>
+  <path d="M692 520L738 650" stroke="#173E39" stroke-width="22" stroke-linecap="round"/>
+  <path d="M508 520L484 668" stroke="#173E39" stroke-width="22" stroke-linecap="round"/>
+  <path d="M612 520L636 668" stroke="#173E39" stroke-width="22" stroke-linecap="round"/>
+  <circle cx="560" cy="298" r="22" fill="#173E39"/>
+  <text x="338" y="118" fill="#173E39" font-size="58" font-family="Arial, sans-serif" font-weight="700">Stability Chair</text>
+</svg>

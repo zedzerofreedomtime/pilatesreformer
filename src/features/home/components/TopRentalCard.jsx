@@ -1,10 +1,19 @@
-import { formatCurrency } from '../utils/formatCurrency'
+import { formatCurrency } from '../../../utils/formatCurrency'
 
 function TopRentalCard({ card, onSelect }) {
   const { equipment, highlight, rank, summary } = card
 
   return (
     <article className="panel p-5">
+      <div className="mb-5 overflow-hidden rounded-[24px] bg-[#f6f1e9]">
+        <img
+          src={equipment.image}
+          alt={equipment.name}
+          className="h-52 w-full object-cover"
+          loading="lazy"
+        />
+      </div>
+
       <div className="flex items-start justify-between gap-3">
         <div>
           <p className="font-display text-4xl text-[#d6a273]">{rank}</p>

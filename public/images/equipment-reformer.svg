@@ -1,0 +1,13 @@
+<svg width="1200" height="800" viewBox="0 0 1200 800" fill="none" xmlns="http://www.w3.org/2000/svg">
+  <rect width="1200" height="800" rx="40" fill="#F6EBDD"/>
+  <rect x="132" y="420" width="640" height="90" rx="24" fill="#D9B89A"/>
+  <rect x="188" y="354" width="530" height="54" rx="20" fill="#FFF7EF"/>
+  <rect x="250" y="286" width="86" height="150" rx="22" fill="#AA6B3F"/>
+  <rect x="744" y="256" width="48" height="248" rx="24" fill="#143C36"/>
+  <rect x="792" y="280" width="164" height="32" rx="16" fill="#143C36"/>
+  <circle cx="282" cy="522" r="28" fill="#143C36"/>
+  <circle cx="650" cy="522" r="28" fill="#143C36"/>
+  <path d="M814 284L928 170" stroke="#C99067" stroke-width="18" stroke-linecap="round"/>
+  <path d="M838 332L960 208" stroke="#C99067" stroke-width="14" stroke-linecap="round"/>
+  <text x="132" y="130" fill="#143C36" font-size="58" font-family="Arial, sans-serif" font-weight="700">Pilates Reformer</text>
+</svg>
