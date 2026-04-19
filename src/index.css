@@ -1,9 +1,9 @@
-@import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@500;600;700&family=IBM+Plex+Sans+Thai:wght@300;400;500;600;700&display=swap');
+@import url('https://fonts.googleapis.com/css2?family=Bai+Jamjuree:wght@400;500;600;700&family=Noto+Sans+Thai:wght@300;400;500;600;700;800&display=swap');
 @import "tailwindcss";
 
 @theme {
-  --font-sans: "IBM Plex Sans Thai", "Noto Sans Thai", sans-serif;
-  --font-display: "Chakra Petch", "IBM Plex Sans Thai", sans-serif;
+  --font-sans: "Noto Sans Thai", sans-serif;
+  --font-display: "Bai Jamjuree", "Noto Sans Thai", sans-serif;
 }
 
 @layer base {
@@ -16,11 +16,11 @@
   }
 
   body {
-    @apply m-0 min-h-screen bg-[#f8f0e7] font-sans text-slate-900 antialiased;
-    background-image:
-      radial-gradient(circle at 0% 0%, rgba(246, 194, 128, 0.9), transparent 28%),
-      radial-gradient(circle at 85% 10%, rgba(93, 145, 136, 0.35), transparent 18%),
-      linear-gradient(140deg, #fbf6f0 0%, #f8efe4 44%, #efe3d2 100%);
+    @apply m-0 min-h-screen font-sans text-slate-900 antialiased;
+    background:
+      radial-gradient(circle at 0% 0%, rgba(244, 177, 118, 0.42), transparent 28%),
+      radial-gradient(circle at 100% 8%, rgba(15, 78, 69, 0.18), transparent 18%),
+      linear-gradient(180deg, #fff9f3 0%, #f3ecdf 45%, #e8e0d3 100%);
   }
 
   a {
@@ -32,15 +32,34 @@
     font: inherit;
   }
 
+  summary::-webkit-details-marker {
+    display: none;
+  }
+
   ::selection {
-    background: #1f5d50;
-    color: #fff7ef;
+    background: #123a35;
+    color: #fff9f3;
   }
 }
 
 @layer utilities {
-  .glass-card {
-    @apply border border-white/55 bg-white/72 backdrop-blur-xl shadow-[0_24px_80px_-36px_rgba(54,38,18,0.35)];
+  .panel {
+    @apply rounded-[32px] border border-white/65 bg-white/78 shadow-[0_26px_80px_-34px_rgba(61,45,24,0.28)] backdrop-blur-xl;
+  }
+
+  .accent-panel {
+    @apply rounded-[32px] border border-[#123a35]/10 bg-[#123a35] text-white shadow-[0_26px_80px_-34px_rgba(18,58,53,0.72)];
+  }
+
+  .soft-grid {
+    background-image:
+      linear-gradient(rgba(255, 255, 255, 0.08) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(255, 255, 255, 0.08) 1px, transparent 1px);
+    background-size: 30px 30px;
+  }
+
+  .eyebrow {
+    @apply inline-flex rounded-full border border-[#e9d7c1] bg-white/85 px-3 py-1 text-xs font-semibold uppercase tracking-[0.24em] text-[#9b5d32];
   }
 }
 
