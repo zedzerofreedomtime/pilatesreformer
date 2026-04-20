@@ -24,6 +24,8 @@ function EquipmentEditForm({
     footprint: equipment.footprint,
     features: formatFeatures(equipment.features ?? []),
   })
+  const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleChange = (field) => (event) => {
     setFormState((current) => ({
@@ -32,10 +34,11 @@ function EquipmentEditForm({
     }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsSaving(true)
 
-    onSave({
+    await onSave({
       name: formState.name.trim() || equipment.name,
       image: formState.image.trim() || equipment.image,
       badge: formState.badge.trim() || equipment.badge,
@@ -46,6 +49,14 @@ function EquipmentEditForm({
       footprint: formState.footprint.trim() || equipment.footprint,
       features: parseFeatures(formState.features),
     })
+
+    setIsSaving(false)
+  }
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    await onDelete()
+    setIsDeleting(false)
   }
 
   return (
@@ -153,17 +164,18 @@ function EquipmentEditForm({
       <div className="flex flex-wrap gap-3 pt-2">
         <button
           type="submit"
-          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+          disabled={isSaving}
+          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          บันทึกข้อมูลอุปกรณ์
+          {isSaving ? 'กำลังบันทึก...' : 'บันทึกข้อมูลอุปกรณ์'}
         </button>
         <button
           type="button"
-          onClick={onDelete}
-          disabled={!canDelete}
+          onClick={handleDelete}
+          disabled={!canDelete || isDeleting}
           className="rounded-full border border-[#e3b4ae] px-5 py-3 text-sm font-semibold text-[#b42318] transition hover:bg-[#fff3f1] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          ลบอุปกรณ์
+          {isDeleting ? 'กำลังลบ...' : 'ลบอุปกรณ์'}
         </button>
       </div>
     </form>
@@ -179,6 +191,7 @@ function EquipmentManagementPanel({
   const [activeEquipmentId, setActiveEquipmentId] = useState(
     equipmentCatalog[0]?.id ?? '',
   )
+  const [isCreating, setIsCreating] = useState(false)
 
   const activeEquipment = useMemo(
     () =>
@@ -187,9 +200,15 @@ function EquipmentManagementPanel({
     [activeEquipmentId, equipmentCatalog],
   )
 
-  const handleAddEquipment = () => {
-    const nextId = onAddEquipment()
-    setActiveEquipmentId(nextId)
+  const handleAddEquipment = async () => {
+    setIsCreating(true)
+    const nextId = await onAddEquipment()
+
+    if (nextId) {
+      setActiveEquipmentId(nextId)
+    }
+
+    setIsCreating(false)
   }
 
   if (!activeEquipment) {
@@ -212,9 +231,10 @@ function EquipmentManagementPanel({
         <button
           type="button"
           onClick={handleAddEquipment}
-          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+          disabled={isCreating}
+          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          เพิ่มอุปกรณ์
+          {isCreating ? 'กำลังเพิ่มอุปกรณ์...' : 'เพิ่มอุปกรณ์'}
         </button>
       </div>
 

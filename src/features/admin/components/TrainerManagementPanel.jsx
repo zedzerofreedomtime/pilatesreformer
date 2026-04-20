@@ -23,6 +23,8 @@ function TrainerEditForm({
     machineFocus: formatList(trainer.machineFocus),
     exerciseFocus: formatList(trainer.exerciseFocus),
   })
+  const [isSaving, setIsSaving] = useState(false)
+  const [isDeleting, setIsDeleting] = useState(false)
 
   const handleChange = (field) => (event) => {
     setFormState((current) => ({
@@ -31,10 +33,11 @@ function TrainerEditForm({
     }))
   }
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsSaving(true)
 
-    onSave({
+    await onSave({
       name: formState.name.trim() || trainer.name,
       image: formState.image.trim() || trainer.image,
       sessionRate: Number(formState.sessionRate) || trainer.sessionRate,
@@ -44,6 +47,14 @@ function TrainerEditForm({
       machineFocus: parseList(formState.machineFocus),
       exerciseFocus: parseList(formState.exerciseFocus),
     })
+
+    setIsSaving(false)
+  }
+
+  const handleDelete = async () => {
+    setIsDeleting(true)
+    await onDelete()
+    setIsDeleting(false)
   }
 
   return (
@@ -103,9 +114,7 @@ function TrainerEditForm({
 
       <div className="grid gap-4 md:grid-cols-2">
         <label className="block">
-          <span className="text-sm font-semibold text-slate-700">
-            เครื่องที่ถนัด
-          </span>
+          <span className="text-sm font-semibold text-slate-700">เครื่องที่ถนัด</span>
           <textarea
             value={formState.machineFocus}
             onChange={handleChange('machineFocus')}
@@ -116,9 +125,7 @@ function TrainerEditForm({
         </label>
 
         <label className="block">
-          <span className="text-sm font-semibold text-slate-700">
-            สไตล์การสอน
-          </span>
+          <span className="text-sm font-semibold text-slate-700">สไตล์การสอน</span>
           <textarea
             value={formState.exerciseFocus}
             onChange={handleChange('exerciseFocus')}
@@ -142,17 +149,18 @@ function TrainerEditForm({
       <div className="flex flex-wrap gap-3 pt-2">
         <button
           type="submit"
-          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+          disabled={isSaving}
+          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          บันทึกข้อมูลเทรนเนอร์
+          {isSaving ? 'กำลังบันทึก...' : 'บันทึกข้อมูลเทรนเนอร์'}
         </button>
         <button
           type="button"
-          onClick={onDelete}
-          disabled={!canDelete}
+          onClick={handleDelete}
+          disabled={!canDelete || isDeleting}
           className="rounded-full border border-[#e3b4ae] px-5 py-3 text-sm font-semibold text-[#b42318] transition hover:bg-[#fff3f1] disabled:cursor-not-allowed disabled:opacity-50"
         >
-          ลบเทรนเนอร์
+          {isDeleting ? 'กำลังลบ...' : 'ลบเทรนเนอร์'}
         </button>
       </div>
     </form>
@@ -166,6 +174,7 @@ function TrainerManagementPanel({
   onRemoveTrainer,
 }) {
   const [activeTrainerId, setActiveTrainerId] = useState(trainerCatalog[0]?.id ?? '')
+  const [isCreating, setIsCreating] = useState(false)
 
   const activeTrainer = useMemo(
     () =>
@@ -174,9 +183,15 @@ function TrainerManagementPanel({
     [activeTrainerId, trainerCatalog],
   )
 
-  const handleAddTrainer = () => {
-    const nextId = onAddTrainer()
-    setActiveTrainerId(nextId)
+  const handleAddTrainer = async () => {
+    setIsCreating(true)
+    const nextId = await onAddTrainer()
+
+    if (nextId) {
+      setActiveTrainerId(nextId)
+    }
+
+    setIsCreating(false)
   }
 
   if (!activeTrainer) {
@@ -192,16 +207,17 @@ function TrainerManagementPanel({
             จัดการรายชื่อเทรนเนอร์
           </h2>
           <p className="mt-3 max-w-3xl text-sm leading-6 text-slate-600">
-            เพิ่ม ลบ และแก้ไขข้อมูลเทรนเนอร์ได้จากจุดเดียว โดยข้อมูลจะถูกนำไปใช้ต่อในหน้าเลือกโค้ชของลูกค้าทันที
+            เพิ่ม ลบ และแก้ไขข้อมูลเทรนเนอร์ได้จากจุดเดียว โดยข้อมูลจะถูกนำไปใช้ต่อในหน้าลูกค้าและหน้า login ของเทรนเนอร์ทันที
           </p>
         </div>
 
         <button
           type="button"
           onClick={handleAddTrainer}
-          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+          disabled={isCreating}
+          className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824] disabled:cursor-not-allowed disabled:opacity-70"
         >
-          เพิ่มเทรนเนอร์
+          {isCreating ? 'กำลังเพิ่มเทรนเนอร์...' : 'เพิ่มเทรนเนอร์'}
         </button>
       </div>
 

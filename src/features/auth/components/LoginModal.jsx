@@ -84,19 +84,32 @@ function LoginForm({
   const [name, setName] = useState('')
   const [email, setEmail] = useState(selectedRole.demoEmail)
   const [password, setPassword] = useState('')
+  const [notice, setNotice] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsSubmitting(true)
+    setNotice(null)
 
-    onLogin({
+    const result = await onLogin({
       name:
         selectedRoleId === 'trainer'
           ? selectedTrainer?.name ?? selectedRole.label
           : name.trim() || selectedRole.label,
       email: email.trim() || selectedRole.demoEmail,
+      password,
       roleId: selectedRoleId,
       trainerId: selectedTrainerLoginId,
     })
+
+    if (result?.status !== 'success') {
+      setNotice({
+        tone: 'red',
+        message: result?.message ?? 'ไม่สามารถเข้าสู่ระบบได้ในตอนนี้',
+      })
+      setIsSubmitting(false)
+    }
   }
 
   return (
@@ -166,12 +179,21 @@ function LoginForm({
           )}
         </div>
 
+        {notice && (
+          <div className="rounded-[22px] bg-[#fff3f1] px-4 py-3 text-sm font-medium text-[#b42318]">
+            {notice.message}
+          </div>
+        )}
+
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
-            className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+            disabled={isSubmitting}
+            className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            Login เป็น {selectedRoleId === 'trainer' && selectedTrainer ? selectedTrainer.name : selectedRole.label}
+            {isSubmitting
+              ? 'กำลังเข้าสู่ระบบ...'
+              : `Login เป็น ${selectedRoleId === 'trainer' && selectedTrainer ? selectedTrainer.name : selectedRole.label}`}
           </button>
           <button
             type="button"
@@ -211,11 +233,14 @@ function RegisterForm({
   const [specialty, setSpecialty] = useState('')
   const [machineFocus, setMachineFocus] = useState('')
   const [notice, setNotice] = useState(null)
+  const [isSubmitting, setIsSubmitting] = useState(false)
 
-  const handleSubmit = (event) => {
+  const handleSubmit = async (event) => {
     event.preventDefault()
+    setIsSubmitting(true)
+    setNotice(null)
 
-    const result = onRegister({
+    const result = await onRegister({
       roleId: selectedRoleId,
       name: name.trim(),
       email: email.trim(),
@@ -229,12 +254,18 @@ function RegisterForm({
     })
 
     if (!result) {
+      setIsSubmitting(false)
       return
     }
 
     setNotice({
-      tone: result.status === 'pending' ? 'amber' : 'green',
-      message: result.message,
+      tone:
+        result.status === 'success'
+          ? 'green'
+          : result.status === 'pending'
+            ? 'amber'
+            : 'red',
+      message: result.message ?? 'ไม่สามารถสมัครสมาชิกได้ในตอนนี้',
     })
 
     if (result.status === 'success') {
@@ -245,6 +276,8 @@ function RegisterForm({
       setSpecialty('')
       setMachineFocus('')
     }
+
+    setIsSubmitting(false)
   }
 
   return (
@@ -349,7 +382,7 @@ function RegisterForm({
         >
           {selectedRoleId === 'trainer'
             ? 'สมัครเป็นเทรนเนอร์แล้ว ระบบจะส่งคำขอไปให้แอดมินตรวจสอบและอนุมัติก่อน จึงจะสามารถเข้าสู่ระบบในฐานะเทรนเนอร์ได้'
-            : 'สมัครเป็นผู้ใช้งานทั่วไปแล้ว ระบบจะสร้างบัญชีให้และเข้าสู่ระบบให้ทันที'}
+            : 'สมัครเป็นผู้ใช้งานทั่วไปแล้ว ระบบจะสร้างบัญชีให้และเข้าสู่ระบบให้อัตโนมัติ'}
         </div>
 
         {notice && (
@@ -357,7 +390,9 @@ function RegisterForm({
             className={`rounded-[22px] px-4 py-3 text-sm font-medium ${
               notice.tone === 'green'
                 ? 'bg-[#eef8f3] text-[#0f5132]'
-                : 'bg-[#fff4e8] text-[#8a4b10]'
+                : notice.tone === 'amber'
+                  ? 'bg-[#fff4e8] text-[#8a4b10]'
+                  : 'bg-[#fff3f1] text-[#b42318]'
             }`}
           >
             {notice.message}
@@ -367,9 +402,10 @@ function RegisterForm({
         <div className="flex flex-wrap gap-3 pt-2">
           <button
             type="submit"
-            className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+            disabled={isSubmitting}
+            className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824] disabled:cursor-not-allowed disabled:opacity-70"
           >
-            สมัครสมาชิก
+            {isSubmitting ? 'กำลังสมัครสมาชิก...' : 'สมัครสมาชิก'}
           </button>
           <button
             type="button"
@@ -475,7 +511,9 @@ function LoginModal({
                   {authMode === 'login' ? 'Optional Login' : 'Member Register'}
                 </span>
                 <h2 className="mt-4 font-display text-4xl text-slate-900">
-                  {authMode === 'login' ? 'เข้าสู่ระบบตามบทบาท' : 'สมัครสมาชิกเพื่อเริ่มใช้งาน'}
+                  {authMode === 'login'
+                    ? 'เข้าสู่ระบบตามบทบาท'
+                    : 'สมัครสมาชิกเพื่อเริ่มใช้งาน'}
                 </h2>
                 <p className="mt-3 max-w-2xl text-sm leading-6 text-slate-600">
                   {authMode === 'login'

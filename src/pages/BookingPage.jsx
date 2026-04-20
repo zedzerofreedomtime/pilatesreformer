@@ -1,9 +1,4 @@
-import { useState } from 'react'
-import {
-  bookingModes,
-  rentalPlanCatalog,
-  trainerServicePlans,
-} from '../data/siteData'
+﻿import { useState } from 'react'
 import TrainerDetailModal from '../features/booking/components/modal/TrainerDetailModal'
 import BookingSidebar from '../features/booking/components/sidebar/BookingSidebar'
 import BookingHeroSection from '../features/booking/sections/BookingHeroSection'
@@ -14,12 +9,65 @@ import TrainerSelectionSection from '../features/booking/sections/TrainerSelecti
 import TrainerServiceSection from '../features/booking/sections/TrainerServiceSection'
 
 function BookingPage({
+  bookingModes,
   bookingState,
   bookingSummary,
   bookingActions,
+  catalogError,
+  isCatalogLoading,
+  onRetryCatalogLoad,
   equipmentCatalog,
+  rentalPlanCatalog,
   trainerCatalog,
+  trainerServicePlans,
 }) {
+  const [expandedTrainerId, setExpandedTrainerId] = useState(null)
+  const hasCatalogData =
+    bookingModes.length > 0 &&
+    equipmentCatalog.length > 0 &&
+    rentalPlanCatalog.length > 0
+
+  if (isCatalogLoading && !hasCatalogData) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+        <section className="panel p-8 sm:p-10">
+          <span className="eyebrow">Booking Status</span>
+          <h1 className="mt-4 font-display text-4xl text-slate-900">
+            Loading booking catalog...
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+            Waiting for equipment, trainer, and plan data from the API.
+          </p>
+        </section>
+      </main>
+    )
+  }
+
+  if (!hasCatalogData) {
+    return (
+      <main className="mx-auto max-w-7xl px-4 pb-16 pt-8 sm:px-6 lg:px-8">
+        <section className="panel p-8 sm:p-10">
+          <span className="eyebrow">Booking Status</span>
+          <h1 className="mt-4 font-display text-4xl text-slate-900">
+            Booking data is unavailable
+          </h1>
+          <p className="mt-4 max-w-2xl text-base leading-7 text-slate-600">
+            {catalogError || 'The API did not return the booking catalog.'}
+          </p>
+          <div className="mt-6 flex flex-wrap gap-3">
+            <button
+              type="button"
+              onClick={() => void onRetryCatalogLoad()}
+              className="rounded-full bg-[#123a35] px-5 py-3 text-sm font-semibold text-white transition hover:bg-[#0b2824]"
+            >
+              Retry API connection
+            </button>
+          </div>
+        </section>
+      </main>
+    )
+  }
+
   const {
     selectedModeId,
     selectedMode,
@@ -46,7 +94,6 @@ function BookingPage({
     onReset,
   } = bookingActions
 
-  const [expandedTrainerId, setExpandedTrainerId] = useState(null)
   const expandedTrainer =
     trainerCatalog.find((trainer) => trainer.id === expandedTrainerId) ?? null
 
@@ -123,11 +170,11 @@ function BookingPage({
           {isBundleMode && (
             <TrainerSelectionSection
               stepLabel="Step 4"
-              description="เริ่มจากดูรายชื่อโค้ชแบบสั้นก่อน แล้วกดดูรายละเอียดเพื่อเปิด popup ที่มีข้อมูลและตารางเวลา 7 วันครบในหน้าต่างเดียว"
+              description="เน€เธโฌเน€เธเธเน€เธเธ”เน€เธยเน€เธเธเน€เธยเน€เธเธ’เน€เธยเน€เธโ€เน€เธเธเน€เธเธเน€เธเธ’เน€เธเธเน€เธยเน€เธเธ—เน€เธยเน€เธเธเน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธเธเน€เธเธ‘เน€เธยเน€เธยเน€เธยเน€เธยเน€เธเธเน€เธย เน€เธยเน€เธเธ…เน€เธยเน€เธเธเน€เธยเน€เธโ€เน€เธโ€เน€เธเธเน€เธเธเน€เธเธ’เน€เธเธเน€เธเธ…เน€เธเธเน€เธโฌเน€เธเธเน€เธเธ•เน€เธเธเน€เธโ€เน€เธโฌเน€เธยเน€เธเธ—เน€เธยเน€เธเธเน€เธโฌเน€เธยเน€เธเธ”เน€เธโ€ popup เน€เธโ€”เน€เธเธ•เน€เธยเน€เธเธเน€เธเธ•เน€เธยเน€เธยเน€เธเธเน€เธเธเน€เธเธเน€เธเธ…เน€เธยเน€เธเธ…เน€เธเธเน€เธโ€ขเน€เธเธ’เน€เธเธเน€เธเธ’เน€เธยเน€เธโฌเน€เธเธเน€เธเธ…เน€เธเธ’ 7 เน€เธเธเน€เธเธ‘เน€เธยเน€เธยเน€เธเธเน€เธยเน€เธยเน€เธยเน€เธเธเน€เธยเน€เธยเน€เธเธ’เน€เธโ€ขเน€เธยเน€เธเธ’เน€เธยเน€เธโฌเน€เธโ€เน€เธเธ•เน€เธเธเน€เธเธ"
               badgeText={
                 equipmentNeedsTrainer
-                  ? 'เครื่องนี้ต้องมีโค้ชประกบทุก session'
-                  : 'Reformer สามารถเลือกโค้ชเพิ่มได้ตามต้องการ'
+                  ? 'เน€เธโฌเน€เธยเน€เธเธเน€เธเธ—เน€เธยเน€เธเธเน€เธยเน€เธยเน€เธเธ•เน€เธยเน€เธโ€ขเน€เธยเน€เธเธเน€เธยเน€เธเธเน€เธเธ•เน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธเธเน€เธเธเน€เธยเน€เธยเน€เธโ€”เน€เธเธเน€เธย session'
+                  : 'Reformer เน€เธเธเน€เธเธ’เน€เธเธเน€เธเธ’เน€เธเธเน€เธโ€“เน€เธโฌเน€เธเธ…เน€เธเธ—เน€เธเธเน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธโฌเน€เธยเน€เธเธ”เน€เธยเน€เธเธเน€เธยเน€เธโ€เน€เธยเน€เธโ€ขเน€เธเธ’เน€เธเธเน€เธโ€ขเน€เธยเน€เธเธเน€เธยเน€เธยเน€เธเธ’เน€เธเธ'
               }
               trainerCatalog={trainerCatalog}
               selectedTrainerId={selectedTrainerId}
@@ -141,7 +188,7 @@ function BookingPage({
             <>
               <TrainerSelectionSection
                 stepLabel="Step 2"
-                description="หน้านี้เหมาะกับลูกค้าที่มีอุปกรณ์อยู่แล้วและต้องการจ้างโค้ชแยก โดยตารางเวลาจะรวมอยู่ใน popup รายละเอียดของแต่ละคน"
+                description="เน€เธเธเน€เธยเน€เธยเน€เธเธ’เน€เธยเน€เธเธ•เน€เธยเน€เธโฌเน€เธเธเน€เธเธเน€เธเธ’เน€เธเธเน€เธยเน€เธเธ‘เน€เธยเน€เธเธ…เน€เธเธเน€เธยเน€เธยเน€เธยเน€เธเธ’เน€เธโ€”เน€เธเธ•เน€เธยเน€เธเธเน€เธเธ•เน€เธเธเน€เธเธเน€เธยเน€เธยเน€เธเธเน€เธโ€เน€เธยเน€เธเธเน€เธเธเน€เธเธเน€เธยเน€เธยเน€เธเธ…เน€เธยเน€เธเธเน€เธยเน€เธเธ…เน€เธเธเน€เธโ€ขเน€เธยเน€เธเธเน€เธยเน€เธยเน€เธเธ’เน€เธเธเน€เธยเน€เธยเน€เธเธ’เน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธยเน€เธเธเน€เธย เน€เธยเน€เธโ€เน€เธเธเน€เธโ€ขเน€เธเธ’เน€เธเธเน€เธเธ’เน€เธยเน€เธโฌเน€เธเธเน€เธเธ…เน€เธเธ’เน€เธยเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธเธเน€เธยเน€เธยเน€เธย popup เน€เธเธเน€เธเธ’เน€เธเธเน€เธเธ…เน€เธเธเน€เธโฌเน€เธเธเน€เธเธ•เน€เธเธเน€เธโ€เน€เธยเน€เธเธเน€เธยเน€เธยเน€เธโ€ขเน€เธยเน€เธเธ…เน€เธเธเน€เธยเน€เธย"
                 trainerCatalog={trainerCatalog}
                 selectedTrainerId={selectedTrainerId}
                 expandedTrainerId={expandedTrainerId}

@@ -1,4 +1,4 @@
-import { useEffect } from 'react'
+﻿import { useEffect } from 'react'
 import AppHeader from './components/layout/AppHeader'
 import LoginModal from './features/auth/components/LoginModal'
 import useAuthState from './features/auth/hooks/useAuthState'
@@ -16,39 +16,57 @@ function App() {
   const {
     equipmentCatalog,
     trainerCatalog,
-    trainerClientMap,
+    rentalPlanCatalog,
+    trainerServicePlans,
     pendingTrainerApplications,
+    trainerClients,
     homePageContent,
     homeStats,
     topRentedCards,
+    catalogError,
+    isCatalogLoading,
+    loadBootstrap,
+    loadPendingApplications,
+    loadTrainerClients,
     addTrainer,
     updateTrainer,
     removeTrainer,
     addEquipment,
     updateEquipment,
     removeEquipment,
-    registerMember,
     approveTrainerApplication,
     rejectTrainerApplication,
     updateHomePageContent,
   } = useSiteCatalogState()
-  const { bookingState, bookingSummary, bookingActions, openBookingSelection } =
-    useBookingState({ equipmentCatalog, trainerCatalog })
   const {
     authUser,
+    authToken,
     isLoginOpen,
     selectedRoleId,
     selectedRole,
     selectedTrainerLoginId,
-    selectedTrainer,
     roleCatalog,
     openLogin,
     closeLogin,
     setSelectedRoleId,
     setSelectedTrainerLoginId,
     login,
+    register,
     logout,
   } = useAuthState({ trainerCatalog })
+  const bookingModes = homePageContent?.bookingModes ?? []
+  const {
+    bookingState,
+    bookingSummary,
+    bookingActions,
+    openBookingSelection,
+  } = useBookingState({
+    bookingModes,
+    equipmentCatalog,
+    rentalPlanCatalog,
+    trainerCatalog,
+    trainerServicePlans,
+  })
 
   useEffect(() => {
     if (
@@ -63,54 +81,76 @@ function App() {
     }
   }, [activePage, authUser?.roleId, navigateToPage])
 
+  useEffect(() => {
+    if (authUser?.roleId === 'admin' && authToken) {
+      void loadPendingApplications(authToken)
+      return
+    }
+
+    void loadPendingApplications('')
+  }, [authToken, authUser?.roleId, loadPendingApplications])
+
+  useEffect(() => {
+    if (authUser?.roleId === 'trainer' && authToken) {
+      void loadTrainerClients(authToken)
+      return
+    }
+
+    void loadTrainerClients('')
+  }, [authToken, authUser?.roleId, loadTrainerClients])
+
   const openBookingPage = (options = {}) => {
     openBookingSelection(options)
     navigateToPage('booking')
   }
 
-  const handleLogin = (payload) => {
-    login(payload)
+  const handleLogin = async (payload) => {
+    const result = await login(payload)
 
-    if (payload.roleId === 'admin') {
-      navigateToPage('admin')
-      return
-    }
-
-    if (payload.roleId === 'trainer') {
-      navigateToPage('trainer')
-      return
-    }
-
-    navigateToPage('home')
-  }
-
-  const handleRegister = (payload) => {
-    const result = registerMember(payload)
-
-    if (!result) {
+    if (result.status !== 'success') {
       return result
     }
 
-    if (payload.roleId === 'user' && result.status === 'success') {
-      login({
-        name: payload.name,
-        email: payload.email,
-        roleId: 'user',
-      })
+    if (result.user.roleId === 'admin') {
+      navigateToPage('admin')
+      return result
+    }
+
+    if (result.user.roleId === 'trainer') {
+      navigateToPage('trainer')
+      return result
+    }
+
+    navigateToPage('home')
+    return result
+  }
+
+  const handleRegister = async (payload) => {
+    const result = await register(payload)
+
+    if (result.status === 'pending') {
+      if (authToken) {
+        await loadPendingApplications(authToken)
+      }
+
+      return result
+    }
+
+    if (result.status === 'success' && result.user?.roleId === 'user') {
       navigateToPage('home')
     }
 
     return result
   }
 
+  const selectedTrainer =
+    trainerCatalog.find((trainer) => trainer.id === selectedTrainerLoginId) ??
+    trainerCatalog[0] ??
+    null
   const activeTrainer =
     authUser?.roleId === 'trainer'
       ? trainerCatalog.find((trainer) => trainer.id === authUser.trainerId) ?? null
       : null
-  const trainerClients =
-    authUser?.roleId === 'trainer'
-      ? trainerClientMap[authUser.trainerId] ?? []
-      : []
 
   return (
     <div className="relative overflow-hidden">
@@ -134,22 +174,31 @@ function App() {
         <HomePage
           homePageContent={homePageContent}
           homeStats={homeStats}
+          catalogError={catalogError}
+          isCatalogLoading={isCatalogLoading}
           onGoToBooking={() => navigateToPage('booking')}
           onOpenBookingPage={openBookingPage}
+          onRetryCatalogLoad={loadBootstrap}
           topRentedCards={topRentedCards}
         />
       )}
 
       {activePage === 'booking' && (
         <BookingPage
+          bookingModes={bookingModes}
           bookingState={bookingState}
           bookingSummary={bookingSummary}
           bookingActions={{
             ...bookingActions,
             onGoHome: () => navigateToPage('home'),
           }}
+          catalogError={catalogError}
+          isCatalogLoading={isCatalogLoading}
+          onRetryCatalogLoad={loadBootstrap}
           equipmentCatalog={equipmentCatalog}
+          rentalPlanCatalog={rentalPlanCatalog}
           trainerCatalog={trainerCatalog}
+          trainerServicePlans={trainerServicePlans}
         />
       )}
 
@@ -164,33 +213,49 @@ function App() {
       {activePage === 'admin' && authUser?.roleId === 'admin' && (
         <AdminPage
           authUser={authUser}
+          authToken={authToken}
           equipmentCatalog={equipmentCatalog}
           trainerCatalog={trainerCatalog}
+          rentalPlanCatalog={rentalPlanCatalog}
+          trainerServicePlans={trainerServicePlans}
           pendingTrainerApplications={pendingTrainerApplications}
           adminActions={{
             onGoToHomeContentAdmin: () => navigateToPage('admin-home-content'),
-            onAddTrainer: addTrainer,
-            onUpdateTrainer: updateTrainer,
-            onRemoveTrainer: removeTrainer,
-            onAddEquipment: addEquipment,
-            onUpdateEquipment: updateEquipment,
-            onRemoveEquipment: removeEquipment,
-            onApproveTrainer: approveTrainerApplication,
-            onRejectTrainer: rejectTrainerApplication,
-            onSaveHomePageContent: updateHomePageContent,
+            onRefreshData: () =>
+              Promise.all([
+                loadBootstrap(),
+                loadPendingApplications(authToken),
+              ]),
+            onAddTrainer: () => addTrainer(authToken),
+            onUpdateTrainer: (trainerId, updates) =>
+              updateTrainer(authToken, trainerId, updates),
+            onRemoveTrainer: (trainerId) => removeTrainer(authToken, trainerId),
+            onAddEquipment: () => addEquipment(authToken),
+            onUpdateEquipment: (equipmentId, updates) =>
+              updateEquipment(authToken, equipmentId, updates),
+            onRemoveEquipment: (equipmentId) =>
+              removeEquipment(authToken, equipmentId),
+            onApproveTrainer: (applicationId) =>
+              approveTrainerApplication(authToken, applicationId),
+            onRejectTrainer: (applicationId) =>
+              rejectTrainerApplication(authToken, applicationId),
           }}
         />
       )}
 
-      {activePage === 'admin-home-content' && authUser?.roleId === 'admin' && (
-        <AdminHomeContentPage
-          equipmentCatalog={equipmentCatalog}
-          homePageContent={homePageContent}
-          onGoToAdmin={() => navigateToPage('admin')}
-          onPreviewHome={() => navigateToPage('home')}
-          onSaveHomePageContent={updateHomePageContent}
-        />
-      )}
+      {activePage === 'admin-home-content' &&
+        authUser?.roleId === 'admin' &&
+        homePageContent && (
+          <AdminHomeContentPage
+            equipmentCatalog={equipmentCatalog}
+            homePageContent={homePageContent}
+            onGoToAdmin={() => navigateToPage('admin')}
+            onPreviewHome={() => navigateToPage('home')}
+            onSaveHomePageContent={(nextContent) =>
+              updateHomePageContent(authToken, nextContent)
+            }
+          />
+        )}
 
       <LoginModal
         isOpen={isLoginOpen}

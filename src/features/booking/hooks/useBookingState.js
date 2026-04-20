@@ -1,17 +1,16 @@
 import { useState } from 'react'
-import {
-  bookingModes,
-  rentalPlanCatalog,
-  trainerServicePlans,
-} from '../../../data/siteData'
 
-function useBookingState({ equipmentCatalog, trainerCatalog }) {
+function useBookingState({
+  bookingModes,
+  equipmentCatalog,
+  rentalPlanCatalog,
+  trainerCatalog,
+  trainerServicePlans,
+}) {
   const [selectedModeId, setSelectedModeId] = useState('bundle')
   const [selectedEquipmentId, setSelectedEquipmentId] = useState('reformer')
   const [selectedRentalPlanId, setSelectedRentalPlanId] = useState('progress')
-  const [selectedTrainerId, setSelectedTrainerId] = useState(
-    trainerCatalog[0]?.id ?? '',
-  )
+  const [selectedTrainerId, setSelectedTrainerId] = useState('')
   const [selectedTrainerServicePlanId, setSelectedTrainerServicePlanId] =
     useState('trainer-core')
 
@@ -40,17 +39,17 @@ function useBookingState({ equipmentCatalog, trainerCatalog }) {
     trainerCatalog[0]
   const selectedTrainerServicePlan =
     trainerServicePlans.find((plan) => plan.id === selectedTrainerServicePlanId) ??
-    trainerServicePlans[1]
+    trainerServicePlans[0]
 
   const isBundleMode = selectedModeId === 'bundle'
   const isEquipmentOnlyMode = selectedModeId === 'equipment-only'
   const isTrainerOnlyMode = selectedModeId === 'trainer-only'
-  const equipmentNeedsTrainer = selectedEquipment.trainerMode === 'required'
+  const equipmentNeedsTrainer = selectedEquipment?.trainerMode === 'required'
 
   const handleModeChange = (modeId) => {
     setSelectedModeId(modeId)
 
-    if (modeId === 'equipment-only' && selectedEquipment.trainerMode === 'required') {
+    if (modeId === 'equipment-only' && selectedEquipment?.trainerMode === 'required') {
       setSelectedEquipmentId('reformer')
     }
   }
@@ -75,27 +74,27 @@ function useBookingState({ equipmentCatalog, trainerCatalog }) {
   const resetBooking = () => {
     setSelectedModeId('bundle')
     setSelectedEquipmentId(equipmentCatalog[0]?.id ?? 'reformer')
-    setSelectedRentalPlanId('progress')
+    setSelectedRentalPlanId(rentalPlanCatalog[0]?.id ?? '')
     setSelectedTrainerId(trainerCatalog[0]?.id ?? '')
-    setSelectedTrainerServicePlanId('trainer-core')
+    setSelectedTrainerServicePlanId(trainerServicePlans[0]?.id ?? '')
   }
 
   const rentalSubtotal = Math.round(
-    selectedEquipment.monthlyRate *
-      selectedRentalPlan.months *
-      selectedRentalPlan.discount,
+    (selectedEquipment?.monthlyRate ?? 0) *
+      (selectedRentalPlan?.months ?? 0) *
+      (selectedRentalPlan?.discount ?? 1),
   )
-  const installFee = selectedRentalPlan.months >= 3 ? 0 : 1500
+  const installFee = (selectedRentalPlan?.months ?? 0) >= 3 ? 0 : 1500
   const bundleSessions = equipmentNeedsTrainer
-    ? selectedRentalPlan.requiredSessions
-    : selectedRentalPlan.optionalSessions
-  const bundleTrainerSubtotal = bundleSessions * selectedTrainer.sessionRate
+    ? selectedRentalPlan?.requiredSessions ?? 0
+    : selectedRentalPlan?.optionalSessions ?? 0
+  const bundleTrainerSubtotal = bundleSessions * (selectedTrainer?.sessionRate ?? 0)
   const bundleGrandTotal = rentalSubtotal + bundleTrainerSubtotal + installFee
   const equipmentOnlyTotal = rentalSubtotal + installFee
   const trainerOnlyTotal = Math.round(
-    selectedTrainer.sessionRate *
-      selectedTrainerServicePlan.sessions *
-      selectedTrainerServicePlan.discount,
+    (selectedTrainer?.sessionRate ?? 0) *
+      (selectedTrainerServicePlan?.sessions ?? 0) *
+      (selectedTrainerServicePlan?.discount ?? 1),
   )
 
   const bookingState = {
